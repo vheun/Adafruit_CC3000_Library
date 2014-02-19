@@ -57,7 +57,7 @@
 #include "netapp.h"
 #include "debug.h"
 
-#define SEND_NON_BLOCKING 0
+//#define SEND_NON_BLOCKING 0
 
 
 
