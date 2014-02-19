@@ -224,6 +224,8 @@ void SpiOpen(gcSpiHandleRx pfRxHandler)
 /**************************************************************************/
 int init_spi(void)
 {
+    
+
 
   DEBUGPRINT_F("\tCC3000: init_spi\n\r");
   
@@ -243,15 +245,84 @@ int init_spi(void)
   digitalWrite(g_irqPin, HIGH); // w/weak pullup
 #endif
 
-  SpiConfigStoreOld(); // prime ccspi_old* values for DEASSERT
-
-  /* Initialise SPI (Mode 1) */
-  SPI.begin();
-  SPI.setDataMode(SPI_MODE1);
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setClockDivider(g_SPIspeed);
+/*
+    
+    // The following code is taken from http://forum.pjrc.com/threads/1156-Teensy-3-SPI-Basic-Clock-Questions?p=29293&viewfull=1#post29293
   
-  SpiConfigStoreMy(); // prime ccspi_my* values for ASSERT
+ //    #if defined(CORE_TEENSY)
+    #define SPI_SR_TXCTR 0x0000f000
+//#define pin 10
+    //Define SPI clock speed:
+//#define BAUD_DIV 0 // 24MHz SPI
+    #define BAUD_DIV 0 // 12MHz SPI
+    //#define BAUD_DIV 2 // 8MHz SPI
+    //#define BAUD_DIV 3 // 6MHz SPI
+    //#define BAUD_DIV 4 // 3MHz SPI
+    
+    //Globals/members:
+    uint32_t ctar0, ctar1, mcr;
+    
+    SPI.begin();
+    SPI.setDataMode(SPI_MODE1);
+    SPI.setBitOrder(MSBFIRST);
+      // SPI.setClockDivider(g_SPIspeed);
+
+    
+       mcr = SPI0_MCR;
+    
+    // Use both CTARs, one for 8 bit, the other 16 bit
+    ctar0 = SPI_CTAR_FMSZ(7) | SPI_CTAR_PBR(0) | SPI_CTAR_BR(BAUD_DIV) | SPI_CTAR_CSSCK(BAUD_DIV) | SPI_CTAR_DBR;
+    ctar1 = SPI_CTAR_FMSZ(15) | SPI_CTAR_PBR(0) | SPI_CTAR_BR(BAUD_DIV) | SPI_CTAR_CSSCK(BAUD_DIV) | SPI_CTAR_DBR;
+    
+    SPI0_CTAR0 = ctar0;
+    SPI0_CTAR1 = ctar1;
+    
+    
+#define SPI_WRITE_8(c) \
+do { \
+while ((SPI0_SR & SPI_SR_TXCTR) >= 0x00004000); \
+SPI0_PUSHR = ((c)&0xff) | SPI0_PUSHR_CTAS(0) | SPI0_PUSHR_CONT; \
+} while(0)
+    
+#define SPI_WRITE_16(w) \
+do { \
+while ((SPI0_SR & SPI_SR_TXCTR) >= 0x00004000); \
+SPI0_PUSHR = ((w)&0xffff) | SPI0_PUSHR_CTAS(1) | SPI0_PUSHR_CONT; \
+} while(0)
+    
+#define SPI_WAIT() \
+while ((SPI0_SR & SPI_SR_TXCTR) != 0); \
+while (!(SPI0_SR & SPI_SR_TCF)); \
+SPI0_SR |= SPI_SR_TCF;
+    
+#define SPI_CS_ON(pin) digitalWrite(pin, 0); \
+SPI0_CTAR0 = ctar0; SPI0_CTAR1 = ctar1; SPI0_MCR = mcr;
+    
+#define SPI_CS_OFF(pin) SPI_WAIT(); \
+digitalWrite(pin, 1);
+    
+   
+    //end
+    */
+   //#else
+    
+    
+    SpiConfigStoreOld(); // prime ccspi_old* values for DEASSERT
+    
+    // Initialise SPI (Mode 1)
+    SPI.begin();
+    SPI.setDataMode(SPI_MODE1);
+    SPI.setBitOrder(MSBFIRST);
+    SPI.setClockDivider(g_SPIspeed);
+    
+     SpiConfigStoreMy(); // prime ccspi_my* values for ASSERT
+    
+ 
+     // #endif
+   
+    
+  
+ 
 
   // Newly-initialized SPI is in the same state that ASSERT_CS will set it
   // to.  Invoke DEASSERT (which also restores SPI registers) so the next
@@ -384,7 +455,7 @@ void SpiWriteDataSynchronous(unsigned char *data, unsigned short size)
 {
   DEBUGPRINT_F("\tCC3000: SpiWriteDataSynchronous Start\n\r");
 
-  unsigned short loc;
+   unsigned short loc;
   for (loc = 0; loc < size; loc ++) 
   {
       SPI.transfer(data[loc]);

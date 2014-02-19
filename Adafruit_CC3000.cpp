@@ -1346,7 +1346,7 @@ size_t Adafruit_CC3000_Client::fastrprint(const __FlashStringHelper *ifsh)
     // Send any remaining data in the transmit buffer.
     n += send(_socket, _tx_buf, idx, 0);
   }
-
+   delay(20);
   return n;
 }
 
@@ -1355,6 +1355,7 @@ size_t Adafruit_CC3000_Client::fastrprintln(const __FlashStringHelper *ifsh)
   size_t r = 0;
   r = fastrprint(ifsh);
   r+= fastrprint(F("\n\r"));
+      delay(20);
   return r;
 }
 
@@ -1366,6 +1367,7 @@ size_t Adafruit_CC3000_Client::fastrprintln(const char *str)
     if ((r = write(str, len, 0)) <= 0) return 0;
   }
   if ((r += write("\n\r", 2, 0)) <= 0) return 0;  // meme fix
+       delay(20);
   return r;
 }
 

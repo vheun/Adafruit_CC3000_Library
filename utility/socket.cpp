@@ -57,6 +57,8 @@
 #include "netapp.h"
 #include "debug.h"
 
+#define SEND_NON_BLOCKING 0
+
 
 
 //Enable this flag if and only if you must comply with BSD socket 
