@@ -1313,10 +1313,19 @@ bool Adafruit_CC3000_Client::connected(void) {
 int16_t Adafruit_CC3000_Client::write(const void *buf, uint16_t len, uint32_t flags)
 {
     int16_t r;
+    CC3KPrinter->println("sendB:");
+    if(tSLInformation.usNumberOfFreeBuffers < 5){
+        while (tSLInformation.usNumberOfFreeBuffers < 5) {
+             CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+            delay(20);
+        }
+    }
+  
     r = send(_socket, buf, len, flags);
+      CC3KPrinter->println("sendA:");
     if(tSLInformation.usNumberOfFreeBuffers < 5){
        while (tSLInformation.usNumberOfFreeBuffers < 5) {
-      //  CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+       CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
             delay(12);
         }
     }
@@ -1401,6 +1410,13 @@ size_t Adafruit_CC3000_Client::fastrprint(const char *str)
 
 int16_t Adafruit_CC3000_Client::read(void *buf, uint16_t len, uint32_t flags) 
 {
+     CC3KPrinter->println("rec1");
+    if(tSLInformation.usNumberOfFreeBuffers < 5){
+        while (tSLInformation.usNumberOfFreeBuffers < 5) {
+            CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+            delay(12);
+        }
+    }
   return recv(_socket, buf, len, flags);
 
 }
@@ -1413,9 +1429,17 @@ int32_t Adafruit_CC3000_Client::close(void) {
 
 uint8_t Adafruit_CC3000_Client::read(void) 
 {
+    
   while ((bufsiz <= 0) || (bufsiz == _rx_buf_idx)) {
     cc3k_int_poll();
     // buffer in some more data
+       CC3KPrinter->println("rec2");
+      if(tSLInformation.usNumberOfFreeBuffers < 5){
+          while (tSLInformation.usNumberOfFreeBuffers < 5) {
+              CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+              delay(12);
+          }
+      }
     bufsiz = recv(_socket, _rx_buf, sizeof(_rx_buf), 0);
     if (bufsiz == -57) {
       close();
