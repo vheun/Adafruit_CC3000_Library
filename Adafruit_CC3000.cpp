@@ -105,7 +105,7 @@ netapp_pingreport_args_t pingReport;
 #define MAXSSID					  (32)
 #define MAXLENGTHKEY 			(32)  /* Cleared for 32 bytes by TI engineering 29/08/13 */
 
-#define MAX_SOCKETS 32  // can change this
+#define MAX_SOCKETS 4  // can change this
 boolean closed_sockets[MAX_SOCKETS] = {false, false, false, false};
 
 /* *********************************************************************** */
@@ -1312,7 +1312,15 @@ bool Adafruit_CC3000_Client::connected(void) {
 
 int16_t Adafruit_CC3000_Client::write(const void *buf, uint16_t len, uint32_t flags)
 {
-  return send(_socket, buf, len, flags);
+    int16_t r;
+    r = send(_socket, buf, len, flags);
+    if(tSLInformation.usNumberOfFreeBuffers < 5){
+       while (tSLInformation.usNumberOfFreeBuffers < 5) {
+      //  CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+            delay(12);
+        }
+    }
+        return r;
 }
 
 
@@ -1320,6 +1328,12 @@ size_t Adafruit_CC3000_Client::write(uint8_t c)
 {
   int32_t r;
   r = send(_socket, &c, 1, 0);
+    if(tSLInformation.usNumberOfFreeBuffers < 5){
+        while (tSLInformation.usNumberOfFreeBuffers < 5) {
+            CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+            delay(12);
+        }
+    }
   if ( r < 0 ) return 0;
   return r;
 }
@@ -1347,6 +1361,7 @@ size_t Adafruit_CC3000_Client::fastrprint(const __FlashStringHelper *ifsh)
     n += send(_socket, _tx_buf, idx, 0);
   }
  //  delay(20);
+  //  if(tSLInformation.usNumberOfFreeBuffers < 6){  while (tSLInformation.usNumberOfFreeBuffers < 6) { delay(12); }}
   return n;
 }
 
@@ -1356,6 +1371,7 @@ size_t Adafruit_CC3000_Client::fastrprintln(const __FlashStringHelper *ifsh)
   r = fastrprint(ifsh);
   r+= fastrprint(F("\n\r"));
     //  delay(20);
+  //  if(tSLInformation.usNumberOfFreeBuffers < 6){  while (tSLInformation.usNumberOfFreeBuffers < 6) { delay(12); }}
   return r;
 }
 
@@ -1368,6 +1384,7 @@ size_t Adafruit_CC3000_Client::fastrprintln(const char *str)
   }
   if ((r += write("\n\r", 2, 0)) <= 0) return 0;  // meme fix
     //   delay(20);
+    //  if(tSLInformation.usNumberOfFreeBuffers < 6){  while (tSLInformation.usNumberOfFreeBuffers < 6) { delay(12); }}
   return r;
 }
 

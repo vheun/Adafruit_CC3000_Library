@@ -29,7 +29,7 @@
 
 // Assume 4 sockets available, 1 of which is used for listening, so at most 3 
 // clients can be connected at once.
-#define MAX_SERVER_CLIENTS 3 
+#define MAX_SERVER_CLIENTS 2
 
 // Facade that wraps a reference to a client instance into something that looks
 // and acts like a client instance value.  This is done to mimic the semantics 
