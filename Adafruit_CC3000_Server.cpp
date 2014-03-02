@@ -44,6 +44,16 @@ bool Adafruit_CC3000_ClientRef::connected(void) {
   return _client->connected();
 }
 
+uint8_t Adafruit_CC3000_ClientRef::onceReseted(void) {
+    //  HANDLE_NULL(_client, 0);
+    return _client->onceReseted();
+}
+
+uint8_t Adafruit_CC3000_ClientRef::onceResetedSetBack(void) {
+    HANDLE_NULL(_client, 0);
+    return _client->onceResetedSetBack();
+}
+
 size_t Adafruit_CC3000_ClientRef::write(uint8_t c) {
   HANDLE_NULL(_client, 0);
   return _client->write(c);
@@ -95,6 +105,10 @@ uint8_t Adafruit_CC3000_ClientRef::available(void) {
 }
 
 
+
+
+
+
 /**************************************************************************/
 /*
   Adafruit_CC3000_Server implementation
@@ -109,16 +123,19 @@ Adafruit_CC3000_Server::Adafruit_CC3000_Server(uint16_t port)
 
 // Return a reference to a client instance which has data available to read.
 Adafruit_CC3000_ClientRef Adafruit_CC3000_Server::available() {
+    delay(15);
   acceptNewConnections();
   // Find the first client which is ready to read and return it.
   for (int i = 0; i < MAX_SERVER_CLIENTS; ++i) {
     if (_clients[i].connected() && _clients[i].available() > 0) {
+          delay(15);
       return Adafruit_CC3000_ClientRef(&_clients[i]);
     }
   }
   // Couldn't find a client ready to read, so return a client that is not 
   // connected to signal no clients are available for reading (convention
   // used by the Ethernet library).
+    delay(15);
   return Adafruit_CC3000_ClientRef(NULL);
 }
 

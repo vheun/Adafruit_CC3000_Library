@@ -79,6 +79,10 @@ class Adafruit_CC3000_Client : public Print {
   // NOTE: If public functions below are added/modified/removed please make sure to update the 
   // Adafruit_CC3000_ClientRef class to match!
 
+    
+    uint8_t onceReseted(void);
+    uint8_t onceResetedSetBack(void);
+    
   bool connected(void);
   size_t write(uint8_t c);
 
@@ -93,11 +97,16 @@ class Adafruit_CC3000_Client : public Print {
   int32_t close(void);
   uint8_t available(void);
 
-  uint8_t _rx_buf[RXBUFFERSIZE], _rx_buf_idx;
+  uint8_t _rx_buf[RXBUFFERSIZE], _rx_buf_idx,_onceReset;
   int16_t bufsiz;
+  
+
+
+ 
 
  private:
   int16_t _socket;
+
 
 };
 
@@ -158,6 +167,8 @@ class Adafruit_CC3000 {
     #endif
 
     void setPrinter(Print*);
+    
+   
 
   private:
     bool _initialised;

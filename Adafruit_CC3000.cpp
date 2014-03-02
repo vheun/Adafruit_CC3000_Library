@@ -228,6 +228,7 @@ Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin,
 /**************************************************************************/
 bool Adafruit_CC3000::begin(uint8_t patchReq, bool useSmartConfigData)
 {
+  // Adafruit_CC3000_Client* onceReset = false;
   if (_initialised) return true;
 
   #ifndef CORE_ADAX
@@ -1272,12 +1273,14 @@ Adafruit_CC3000_Client Adafruit_CC3000::connectUDP(uint32_t destIP, uint16_t des
 /**********************************************************************/
 Adafruit_CC3000_Client::Adafruit_CC3000_Client(void) {
   _socket = -1;
+      _onceReset = 40;
 }
 
 Adafruit_CC3000_Client::Adafruit_CC3000_Client(uint16_t s) {
   _socket = s; 
   bufsiz = 0;
   _rx_buf_idx = 0;
+    _onceReset = 40;
 }
 
 Adafruit_CC3000_Client::Adafruit_CC3000_Client(const Adafruit_CC3000_Client& copy) {
@@ -1286,6 +1289,7 @@ Adafruit_CC3000_Client::Adafruit_CC3000_Client(const Adafruit_CC3000_Client& cop
   bufsiz = copy.bufsiz;
   _rx_buf_idx = copy._rx_buf_idx;
   memcpy(_rx_buf, copy._rx_buf, RXBUFFERSIZE);
+      _onceReset = 40;
 }
 
 void Adafruit_CC3000_Client::operator=(const Adafruit_CC3000_Client& other) {
@@ -1295,6 +1299,7 @@ void Adafruit_CC3000_Client::operator=(const Adafruit_CC3000_Client& other) {
   _rx_buf_idx = other._rx_buf_idx;
   memcpy(_rx_buf, other._rx_buf, RXBUFFERSIZE);
 }
+
 
 bool Adafruit_CC3000_Client::connected(void) { 
   if (_socket < 0) return false;
@@ -1310,23 +1315,57 @@ bool Adafruit_CC3000_Client::connected(void) {
   else return true;  
 }
 
+
+
+uint8_t Adafruit_CC3000_Client::onceResetedSetBack(void)
+{
+    
+    //  onceReset = false;
+    return false;
+}
+
+
+
 int16_t Adafruit_CC3000_Client::write(const void *buf, uint16_t len, uint32_t flags)
 {
     int16_t r;
-    CC3KPrinter->println("sendB:");
+    //CC3KPrinter->println("sendB:");
+    int ccount = 0;
     if(tSLInformation.usNumberOfFreeBuffers < 5){
         while (tSLInformation.usNumberOfFreeBuffers < 5) {
-             CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
-            delay(20);
+         // CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+            delay(3);
+            ccount++;
+            
+           /* if(ccount>=60)
+            {
+                wlan_stop();
+                   CC3KPrinter->println("resetA");
+                delay(5000);
+                wlan_start(0);
+                //  onceReset = true;
+                 return 5000;
+            }*/
         }
     }
-  
+  //  CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
     r = send(_socket, buf, len, flags);
-      CC3KPrinter->println("sendA:");
+     // CC3KPrinter->println("sendA:");
     if(tSLInformation.usNumberOfFreeBuffers < 5){
        while (tSLInformation.usNumberOfFreeBuffers < 5) {
-       CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
-            delay(12);
+      CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+            delay(3);
+           ccount++;
+           
+          /* if(ccount>=60)
+           {
+             //  wlan_stop();
+                     CC3KPrinter->println("resetB");
+               delay(5000);
+               wlan_start(0);
+              // onceReset = true;
+               return 5000;
+           }*/
         }
     }
         return r;
@@ -1336,16 +1375,27 @@ int16_t Adafruit_CC3000_Client::write(const void *buf, uint16_t len, uint32_t fl
 size_t Adafruit_CC3000_Client::write(uint8_t c)
 {
   int32_t r;
+     int ccount = 0;
   r = send(_socket, &c, 1, 0);
     if(tSLInformation.usNumberOfFreeBuffers < 5){
         while (tSLInformation.usNumberOfFreeBuffers < 5) {
-            CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
-            delay(12);
+           // CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+            delay(1);
+            ccount++;
+            
+            /*if(ccount>=6)
+            {
+                wlan_stop();
+                delay(5000);
+                wlan_start(0);
+                 return 5000;
+            }*/
         }
     }
   if ( r < 0 ) return 0;
   return r;
 }
+
 
 size_t Adafruit_CC3000_Client::fastrprint(const __FlashStringHelper *ifsh)
 {
@@ -1410,10 +1460,10 @@ size_t Adafruit_CC3000_Client::fastrprint(const char *str)
 
 int16_t Adafruit_CC3000_Client::read(void *buf, uint16_t len, uint32_t flags) 
 {
-     CC3KPrinter->println("rec1");
+    // CC3KPrinter->println("rec1");
     if(tSLInformation.usNumberOfFreeBuffers < 5){
         while (tSLInformation.usNumberOfFreeBuffers < 5) {
-            CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+          //  CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
             delay(12);
         }
     }
@@ -1433,10 +1483,10 @@ uint8_t Adafruit_CC3000_Client::read(void)
   while ((bufsiz <= 0) || (bufsiz == _rx_buf_idx)) {
     cc3k_int_poll();
     // buffer in some more data
-       CC3KPrinter->println("rec2");
+    //   CC3KPrinter->println("rec2");
       if(tSLInformation.usNumberOfFreeBuffers < 5){
           while (tSLInformation.usNumberOfFreeBuffers < 5) {
-              CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
+             // CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
               delay(12);
           }
       }
@@ -1456,6 +1506,7 @@ uint8_t Adafruit_CC3000_Client::read(void)
 
 uint8_t Adafruit_CC3000_Client::available(void) {
   // not open!
+    
   if (_socket < 0) return 0;
 
   if ((bufsiz > 0) // we have some data in the internal buffer
@@ -1477,6 +1528,16 @@ uint8_t Adafruit_CC3000_Client::available(void) {
   //if (CC3KPrinter != 0) } CC3KPrinter->print(F("Select: ")); CC3KPrinter->println(s); }
   if (s == 1) return 1;  // some data is available to read
   else return 0;  // no data is available
+}
+
+
+uint8_t Adafruit_CC3000_Client::onceReseted(void)
+{
+    // _onceReset = 40;
+    CC3KPrinter->println(_onceReset);
+    //   uint8_t t = _onceReset;
+    return 20;
+    //  onceReset=false;
 }
 
 void Adafruit_CC3000::setPrinter(Print* p) {

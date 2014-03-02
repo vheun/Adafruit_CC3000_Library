@@ -43,6 +43,10 @@ class Adafruit_CC3000_ClientRef : public Print {
   operator bool();
   // Below are all the public methods of the client class:
   bool connected(void);
+    
+    uint8_t onceReseted(void);
+    uint8_t onceResetedSetBack(void);
+    
   size_t write(uint8_t c);
 
   size_t fastrprint(const char *str);
@@ -55,6 +59,8 @@ class Adafruit_CC3000_ClientRef : public Print {
   uint8_t read(void);
   int32_t close(void);
   uint8_t available(void);
+    
+  
 
  private:
   // Hide the fact that users are really dealing with a pointer to a client
@@ -82,7 +88,8 @@ public:
   virtual size_t write(uint8_t value);
   // Make the overloads of write from the Print base class available.
   using Print::write;
-
+    
+  
 private:
   // Store the clients in a simple array.
   Adafruit_CC3000_Client _clients[MAX_SERVER_CLIENTS];
