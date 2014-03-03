@@ -123,19 +123,19 @@ Adafruit_CC3000_Server::Adafruit_CC3000_Server(uint16_t port)
 
 // Return a reference to a client instance which has data available to read.
 Adafruit_CC3000_ClientRef Adafruit_CC3000_Server::available() {
-    delay(15);
+    delay(5);
   acceptNewConnections();
   // Find the first client which is ready to read and return it.
   for (int i = 0; i < MAX_SERVER_CLIENTS; ++i) {
     if (_clients[i].connected() && _clients[i].available() > 0) {
-          delay(15);
+          delay(5);
       return Adafruit_CC3000_ClientRef(&_clients[i]);
     }
   }
   // Couldn't find a client ready to read, so return a client that is not 
   // connected to signal no clients are available for reading (convention
   // used by the Ethernet library).
-    delay(15);
+    delay(5);
   return Adafruit_CC3000_ClientRef(NULL);
 }
 

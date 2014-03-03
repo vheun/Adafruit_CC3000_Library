@@ -1334,7 +1334,7 @@ int16_t Adafruit_CC3000_Client::write(const void *buf, uint16_t len, uint32_t fl
     if(tSLInformation.usNumberOfFreeBuffers < 5){
         while (tSLInformation.usNumberOfFreeBuffers < 5) {
          // CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
-            delay(3);
+            delay(1);
             ccount++;
             
            /* if(ccount>=60)
@@ -1354,7 +1354,7 @@ int16_t Adafruit_CC3000_Client::write(const void *buf, uint16_t len, uint32_t fl
     if(tSLInformation.usNumberOfFreeBuffers < 5){
        while (tSLInformation.usNumberOfFreeBuffers < 5) {
       CC3KPrinter->println(tSLInformation.usNumberOfFreeBuffers);
-            delay(3);
+            delay(1);
            ccount++;
            
           /* if(ccount>=60)
